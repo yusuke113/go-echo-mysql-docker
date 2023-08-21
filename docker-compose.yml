@@ -1,0 +1,44 @@
+version: '3'
+services:
+  go:
+    container_name: go
+    build:
+      context: .
+      dockerfile: ./docker/go/Dockerfile
+    tty: true
+    volumes:
+      - ./app:/go/src
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      docker_go_net:
+  db:
+    container_name: db
+    build:
+      context: .
+      dockerfile: ./docker/db/Dockerfile
+    tty: true
+    platform: linux/amd64 # M1チップの場合はコメントアウトを外す
+    environment:
+      MYSQL_DATABASE: go-docker
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - type: bind
+        source: ./docker/db/my.cnf
+        target: /etc/mysql/conf.d/my.cnf
+      - type: volume
+        source: mysql_data
+        target: /var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      docker_go_net:
+
+networks:
+  docker_go_net:
+volumes:
+  mysql_data:
