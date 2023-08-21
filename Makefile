@@ -27,15 +27,12 @@ help:
 init:
 	@echo "\033[1;32mDocker環境のセットアップ中...\033[0m"
 	@make build
-	docker-compose run --rm app npm i
 	@make up
+	@make migrate-seeder
 remake:
 	@echo "\033[1;32mDocker環境削除中...\033[0m"
 	@make destroy
-	@echo "\033[1;32mDocker環境のセットアップ中...\033[0m"
-	@make build
-	docker-compose run --rm app npm i
-	@make up
+	@make init
 ps:
 	docker ps -a
 build:
@@ -58,6 +55,8 @@ destroy:
 # ----------------------------------------------
 go:
 	docker-compose exec go bash
+start:
+	docker-compose exec go bash -c 'go run main.go'
 migrate:
 	docker-compose exec go bash -c 'go run migrate/migrations/migrate.go'
 seeder:
